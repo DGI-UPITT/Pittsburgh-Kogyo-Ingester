@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 from types import DictType
 import os
 from islandoraUtils import fileConverter as converter
@@ -140,9 +141,10 @@ def addObjectToFedora(fedora, myLabel, myPid, parentPid, contentModel, tnUrl=Non
 
     # thumbnail, if one is supplied
     if tnUrl:
-        # possibly check if tnUrl is a valid jpg
+        # possibly check if tnUrl is a valid image?
         #add a TN datastream to the object after creating it from the book cover
-        fedoraLib.update_datastream(obj, 'TN', tnUrl, label=myLabel+'_TN.jpg', mimeType='image/jpeg')
+        tnExt = os.path.splitext(tnUrl)[1]
+        fedoraLib.update_datastream(obj, u'TN', tnUrl, label=u"%s_TN%s" % (myLabel, tnExt), mimeType=misc.getMimeType(tnExt))
 
     # rels-ext relations
     obj_relsext = createRelsExt(obj, parentPid, contentModel, extraNamespaces=extraNamespaces, extraRelationships=extraRelationships)
