@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 from islandoraUtils import fileConverter as converter
 from islandoraUtils import fileManipulator as manipulator
 from utils.commonFedora import *
@@ -83,7 +84,7 @@ def createObjectFromFiles(fedora, config, objectData):
         filename = pageIndex.xpath("//mets:fileSec/mets:fileGrp/mets:file[@ID='%s']/mets:FLocat" % fileid, namespaces=nsmap)[0].attrib['{%s}href' % nsmap['xlink']]
         tup = (fileid, label, os.path.join(os.path.splitext(filename)[0], filename))
         fullPageData.append(tup)
-        print("Label=%s, fid=%s filename=%s" % tup)
+        print("fileid=%s, label='%s' filename='%s'" % tup)
     fullPageData.sort(key=lambda tup: tup[0])
     count = len(fullPageData)
 
@@ -114,7 +115,7 @@ def createObjectFromFiles(fedora, config, objectData):
         if not config.dryrun:
             # create the object (page)
             try:
-                obj = addObjectToFedora(fedora, unicode(pageset[1]), pagePid, objPid, "archiveorg:pageCModel",
+                obj = addObjectToFedora(fedora, u"""""unicode(pageset[1])""", pagePid, objPid, "archiveorg:pageCModel",
                         extraNamespaces=extraNamespaces, extraRelationships=extraRelationships)
             except FedoraConnectionException, fcx:
                 print("Connection error while trying to add fedora object (%s) - the connection to fedora may be broken", page)

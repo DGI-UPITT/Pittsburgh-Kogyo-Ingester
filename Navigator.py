@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 from utils.commonFedora import *
 import glob, zipfile, sys
 import FileIngester
@@ -18,10 +19,13 @@ def processFolder(fedora, config):
     # the host collection (topmost root)
     hostCollection = addCollectionToFedora(fedora, config.hostCollectionName, myPid=config.hostCollectionPid, tnUrl=config.hostCollectionIcon)
     # the aggregate (contains the books)
+    # if you set hostcollectionpid and mycollectionpid to the same value then
+    # addCollectionToFedora won't add the second one, it will simply return the
+    # first one saying "oh, you must have meant this one"
     myCollection = addCollectionToFedora(fedora, config.myCollectionName, myPid=config.myCollectionPid, parentPid=config.hostCollectionPid, tnUrl=config.myCollectionIcon)
 
     # this is the list of all folders to search in for books
-    baseFileDict = { 'parentPid' : config.myCollectionPid, 'contentModel' : 'archiveorg:bookcmodel' }
+    baseFileDict = { 'parentPid' : config.myCollectionPid, 'contentModel' : 'archiveorg:bookCModel' }
     totalFiles = 0
     completeFiles = 0
     for subFolder in os.listdir(folder):
