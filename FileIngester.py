@@ -43,17 +43,18 @@ def createObjectFromFiles(fedora, config, objectData):
 
     for ds in [ "DC", "MODS", "MARC", "METS" ]:
         # some error checking
-        if not objectData['datastreams'][ds]:
+        if not (objectData['datastreams'].has_key(ds) and objectData['datastreams'][ds]):
             # broken object
             print("Object data is missing required datastream: %s" % ds)
             return False
 
     objPid = "%s:%s" % (config.fedoraNS, objectData['label'])
+    extraRelationships = { fedora_relationships.rels_predicate('fedora', 'hasPageProgression') : "lr" }
 
     if not config.dryrun:
         # create the object (page)
         try:
-            bookObj = addCollectionToFedora(fedora, unicode("%s" % objectData['label']), objPid, objectData['parentPid'], objectData['contentModel'])
+            bookObj = addCollectionToFedora(fedora, unicode("%s" % objectData['label']), objPid, objectData['parentPid'], objectData['contentModel'], extraRelationships=extraRelationships)
         except FedoraConnectionException, fcx:
             print("Connection error while trying to add fedora object (%s) - the connection to fedora may be broken", objPid)
             return False
@@ -84,7 +85,6 @@ def createObjectFromFiles(fedora, config, objectData):
         filename = pageIndex.xpath("//mets:fileSec/mets:fileGrp/mets:file[@ID='%s']/mets:FLocat" % fileid, namespaces=nsmap)[0].attrib['{%s}href' % nsmap['xlink']]
         tup = (fileid, label, os.path.join(os.path.splitext(filename)[0], filename))
         fullPageData.append(tup)
-        print("fileid=%s, label='%s' filename='%s'" % tup)
     fullPageData.sort(key=lambda tup: tup[0])
     count = len(fullPageData)
 
@@ -115,7 +115,9 @@ def createObjectFromFiles(fedora, config, objectData):
         if not config.dryrun:
             # create the object (page)
             try:
-                obj = addObjectToFedora(fedora, u"""""unicode(pageset[1])""", pagePid, objPid, "archiveorg:pageCModel",
+                #obj = addObjectToFedora(fedora, unicode(pageset[1]), pagePid, objPid, "archiveorg:pageCModel",
+                #        extraNamespaces=extraNamespaces, extraRelationships=extraRelationships)
+                obj = addObjectToFedora(fedora, u"", pagePid, objPid, "archiveorg:pageCModel",
                         extraNamespaces=extraNamespaces, extraRelationships=extraRelationships)
             except FedoraConnectionException, fcx:
                 print("Connection error while trying to add fedora object (%s) - the connection to fedora may be broken", page)
