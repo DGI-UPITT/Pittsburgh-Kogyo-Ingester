@@ -74,7 +74,7 @@ def createRelsExt(childObject, parentPid, contentModel, extraNamespaces={}, extr
                 print("Error updating obj(%s) RELS-EXT" % childObject.pid)
     return rels_ext
 
-def addCollectionToFedora(fedora, myLabel, myPid, parentPid="islandora:root", contentModel="islandora:collectionCModel", tnUrl=None):
+def addCollectionToFedora(fedora, myLabel, myPid, parentPid="islandora:root", contentModel="islandora:collectionCModel", tnUrl=None, extraNamespaces={}, extraRelationships={}):
     """
     Add a collection (not an object) to fedora
     @param fedora The fedora instance to add the collection to
@@ -108,7 +108,7 @@ def addCollectionToFedora(fedora, myLabel, myPid, parentPid="islandora:root", co
         fedoraLib.update_datastream(collection_object, u'TN', tnUrl, label=u"%s_TN%s" % (myLabel, tnExt), mimeType=misc.getMimeType(tnExt))
 
     # rels-ext relations
-    collection_relsext = createRelsExt(collection_object, parentPid, contentModel)
+    collection_relsext = createRelsExt(collection_object, parentPid, contentModel, extraNamespaces=extraNamespaces, extraRelationships=extraRelationships)
 
     return collection_object
 
