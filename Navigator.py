@@ -48,6 +48,7 @@ def processFolder(fedora, config):
             addFileByPattern("DC", "*.dc.xml")
             addFileByPattern("MARC", "*.marcxml.xml")
             addFileByPattern("METS", "*.mets.xml")
+            addFileByPattern("VRA", "*.vra.xml")
 
             # creation of the dictionary here might be bad
             fileDict.update(baseFileDict)
