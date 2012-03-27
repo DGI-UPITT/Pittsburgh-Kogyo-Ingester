@@ -59,7 +59,7 @@ def createRelsExt(childObject, parentPid, contentModel, extraNamespaces={}, extr
     rels_ext.addRelationship(fedora_relationships.rels_predicate('fedora', 'isMemberOfCollection'), [parentPid, "pid"])
     if extraRelationships and type(extraRelationships) is DictType:
         for k, v in extraRelationships.iteritems():
-            rels_ext.addRelationship(k, [v, "literal"])
+            rels_ext.addRelationship(k, [v, "pid"]) # use pid instead of literal so it is stored in rdf:resource instead of the text node
 
     loop = True
     while loop:
@@ -104,6 +104,7 @@ def addCollectionToFedora(fedora, myLabel, myPid, parentPid="islandora:root", co
 
     # thumbnail, if one is supplied
     if tnUrl:
+        # possibly check if tnUrl is a valid image?
         tnExt = os.path.splitext(tnUrl)[1]
         fedoraLib.update_datastream(collection_object, u'TN', tnUrl, label=u"%s_TN%s" % (myLabel, tnExt), mimeType=misc.getMimeType(tnExt))
 
