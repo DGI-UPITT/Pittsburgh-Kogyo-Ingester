@@ -49,7 +49,7 @@ def createObjectFromFiles(fedora, config, objectData):
             return False
 
     objPid = "%s:%s" % (config.fedoraNS, objectData['label'])
-    extraRelationships = { fedora_relationships.rels_predicate('fedora', 'hasPageProgression') : "lr" }
+    extraRelationships = { fedora_relationships.rels_predicate('fedora', 'hasPageProgression') : "rl" } # a right-to-left book
 
     if not config.dryrun:
         # create the object (page)
@@ -95,7 +95,7 @@ def createObjectFromFiles(fedora, config, objectData):
         #add a TN datastream to the book
         fedoraLib.update_datastream(bookObj, u"TN", tnFile, label=unicode(config.myCollectionName+"_TN.jpg"), mimeType=misc.getMimeType("jpg"))
 
-    print("Build kogyo book object with %d pages" % count)
+    print("Build book object with %d pages" % count)
 
     baseName = objectData['label']
 
@@ -110,14 +110,15 @@ def createObjectFromFiles(fedora, config, objectData):
         pagePid = "%s-%d" % (objPid, idx+1) # objPid contains the namespace part of the pid
 
         extraNamespaces = { 'pageNS' : 'info:islandora/islandora-system:def/pageinfo#' }
-        extraRelationships = { fedora_relationships.rels_predicate('pageNS', 'isPageNumber') : str(idx+1) }
+        extraRelationships = { fedora_relationships.rels_predicate('pageNS', 'isPageNumber') : str(idx+1),
+                               fedora_relationships.rels_predicate('pageNS', 'isPageOf') : str(objPid) }
 
         if not config.dryrun:
             # create the object (page)
             try:
                 #obj = addObjectToFedora(fedora, unicode(pageset[1]), pagePid, objPid, "archiveorg:pageCModel",
                 #        extraNamespaces=extraNamespaces, extraRelationships=extraRelationships)
-                obj = addObjectToFedora(fedora, u"", pagePid, objPid, "archiveorg:pageCModel",
+                obj = addObjectToFedora(fedora, u"", pagePid, objPid, "islandora:pageCModel",
                         extraNamespaces=extraNamespaces, extraRelationships=extraRelationships)
             except FedoraConnectionException, fcx:
                 print("Connection error while trying to add fedora object (%s) - the connection to fedora may be broken", page)
@@ -138,10 +139,10 @@ def createObjectFromFiles(fedora, config, objectData):
                 dsfile = os.path.join(bookFolder, "%s.%s.xml" % (os.path.splitext(page)[0], dsid.lower()))
                 dspage = os.path.basename(dsfile)
                 fedoraLib.update_datastream(obj, unicode(dsid), dsfile, label=unicode(dspage), mimeType=misc.getMimeType("xml"), controlGroup='X')
-            """
+
             pdfFile = os.path.join(config.tempDir, "%s.pdf" % basePage)
-            converter.tif_to_pdf(tifFile, pdfFile, ['-q', '25'])
-            fedoraLib.update_datastream(obj, u'PDF', pdfFile, label=unicode("%s.pdf" % basePage), mimeType=misc.getMimeType("pdf"))
+            converter.tif_to_pdf(tifFile, pdfFile, 'default')
+            #fedoraLib.update_datastream(obj, u'PDF', pdfFile, label=unicode("%s.pdf" % basePage), mimeType=misc.getMimeType("pdf"))
             # for the first page, move it to the full when finished with it
             if idx == 0:
                 os.rename(pdfFile, fullPDF)
@@ -149,15 +150,15 @@ def createObjectFromFiles(fedora, config, objectData):
             else:
                 manipulator.appendPDFwithPDF(fullPDF, pdfFile)
                 os.remove(pdfFile)
-            """
+
         sys.stdout.flush()
         sys.stderr.flush()
-    """
+
     # ingest the full PDF on the master book object
     # and delete it
     if not config.dryrun:
         print("Ingesting full PDF document")
         fedoraLib.update_datastream(bookObj, u"PDF", fullPDF, label=os.path.basename(fullPDF), mimeType=misc.getMimeType("pdf"))
         os.remove(fullPDF)
-    """
+
     return True
